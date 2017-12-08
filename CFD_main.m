@@ -3,38 +3,48 @@ close all
 clc
 
 %% Import data
-[alpha_0012,cd_0012,cl_0012] = readfile('0012_tracking');
-[alpha_4412,cd_4412,cl_4412] = readfile('4412_tracking');
+[alpha_0012,cd_0012,cl_0012] = readfile('0012_tracking_old');
+[alpha_4412,cd_4412,cl_4412] = readfile('4412_tracking_old');
 exp_data_cl_0012 = csvread('cl_0012_experimental.csv');
 exp_data_clvscd_0012 = csvread('clvscd_0012_experimental.csv');
-
+exp_data_cl_4412 = csvread('cl_4412_experimental.csv');
+exp_data_clvscd_4412 = csvread('clvscd_4412_experimental.csv');
 %% Analysis
-%trash
-% alpha_0012 = [-19,-18,-17,-16,-15,-14,-13,-12,-11,-10,-5,0,5,10,11,12,13,14,15,16,17,18,19];
-% cd_0012 = [0.2337105340387045,0.1992141751368496,0.1547370787508896,0.1014119182341816,0.04007658407181494,...
-%     0.03038698615782057,0.02383889216719979,0.0183522195487355,0.01503545550721251,...
-%     0.01295209618140718,0.009123845112331101,0.008045517861030008,0.009130122649368876,...
-%     0.01344839314919336,0.01427565991329024,0.01682353049630615,0.02112554447742803,...
-%     0.02967744764380508,0.04255011459812982,0.08422166165516652,0.1379335913976333,...
-%     0.1893994078926131,0.2198012150782935];
-% 
-% cl_0012 = [-0.781540551272112,-0.785735036232128,-0.8393255207040846,-0.9773952183982904,-1.226892596977155,...
-%     -1.309256911615563,-1.29524407311504,-1.238362342947007,-1.167257607072284,...
-%     -1.081448727086717,-0.5620608195351237,1.376686499713053e-05,0.5627278660536101,...
-%     1.066439290421064,1.163220247461734,1.2419530348268,1.303570667861422,...
-%     1.332339819056809,1.270349480945173,1.029918553325691,0.8589191752226665,...
-%     0.7765488963439123,0.7553405056361602];
+% 0012
+% CFD
+[a0_0012,alphaL0_0012,alpha_stall_0012,cl_max_0012] = calc_vals(alpha_0012,cl_0012);
+% Experimental data
+[exp_a0_0012,exp_alphaL0_0012,exp_alpha_stall_0012,exp_cl_max_0012] =...
+                    calc_vals(exp_data_cl_0012(:,1),exp_data_cl_0012(:,2));
+% Vortex Panel Method
+set(0,'DefaultFigureVisible','off')
+[vp_cl_0012,vp_a0_0012,vp_L0_0012,vp_mcl_0012] = vortex_panel_results(0,0,12,alpha_0012);
+set(0,'DefaultFigureVisible','on')
 
+% 4412
+% CFD
+[a0_4412,alphaL0_4412,alpha_stall_4412,cl_max_4412] = calc_vals(alpha_4412,cl_4412);
+% Experimental data
+[exp_a0_4412,exp_alphaL0_4412,exp_alpha_stall_4412,exp_cl_max_4412] =...
+                    calc_vals(exp_data_cl_4412(:,1),exp_data_cl_4412(:,2));
+% Vortex Panel Method
+set(0,'DefaultFigureVisible','off')
+[vp_cl_4412,vp_a0_4412,vp_L0_4412,vp_mcl_4412] = vortex_panel_results(4,4,12,alpha_4412);
+set(0,'DefaultFigureVisible','on')
 
+%% Plot
+% 0012
 % cl
 figure;
 hold on
 scatter(exp_data_cl_0012(:,1),exp_data_cl_0012(:,2),'d','LineWidth',2);
 scatter(alpha_0012,cl_0012,'LineWidth',2);
+plot(alpha_0012,vp_cl_0012,'LineWidth',2);
 grid on
 xlabel('Angle of Attack [^o]');
 ylabel('C_l');
-legend('Experimental','CFD');
+title('C_l vs. AoA for NACA 0012 at Re = 6E06')
+legend('Experimental','CFD','Vortex Panel Method','Location','NorthWest');
 hold off
 
 % cd
@@ -45,5 +55,38 @@ scatter(cl_0012,cd_0012,'LineWidth',2);
 grid on
 xlabel('C_l');
 ylabel('C_d');
-legend('Experimental','CFD');
+title('C_l vs. C_d for NACA 0012 at Re = 6E06')
+legend('Experimental','CFD','Location','NorthWest');
 hold off
+
+% 4412
+% cl
+figure;
+hold on
+scatter(exp_data_cl_4412(:,1),exp_data_cl_4412(:,2),'d','LineWidth',2);
+scatter(alpha_4412,cl_4412,'LineWidth',2);
+plot(alpha_4412,vp_cl_4412,'LineWidth',2);
+grid on
+xlabel('Angle of Attack [^o]');
+ylabel('C_l');
+title('C_l vs. AoA for NACA 4412 at Re = 3E06')
+legend('Experimental','CFD','Vortex Panel Method','Location','NorthWest');
+hold off
+
+% cd
+figure;
+hold on
+scatter(exp_data_clvscd_4412(:,1),exp_data_clvscd_4412(:,2),'d','LineWidth',2);
+scatter(cl_4412,cd_4412,'LineWidth',2);
+grid on
+xlabel('C_l');
+ylabel('C_d');
+title('C_l vs. C_d for NACA 4412 at Re = 3E06')
+legend('Experimental','CFD','Location','NorthWest');
+hold off
+
+
+
+
+
+
